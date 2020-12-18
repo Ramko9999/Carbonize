@@ -8,16 +8,13 @@
         "48": "assets/icon48.png",
         "16": "assets/icon16.png"
     },
+    "browser_action":{
+        "default_title": "Carbonize",
+        "default_popup": "src/html/popup.html"
+    },
     "background":{
         "scripts": ["src/background.js"],
         "persistent": false
     },
-    "content_scripts": [
-        {
-            "matches": ["https://medium.com/*"],
-            "run_at": "document_idle",
-            "js": ["src/content.js"]
-        }
-    ],
-    "permissions":["contextMenus"]
+    "permissions":["contextMenus", "storage"]
 }

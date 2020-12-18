@@ -91,7 +91,7 @@ const buildCarbonUrl = (selectionCode) => {
         url.push(fontParams);
     }
     url.push("wm=false&");
-    url.push(`code=${selectionCode}`);
+    url.push(`code=${encodeURIComponent(selectionCode)}`);
     return url.join("");
 }
 
@@ -99,9 +99,11 @@ const buildCarbonUrl = (selectionCode) => {
 chrome.runtime.onInstalled.addListener(()=>{
     chrome.contextMenus.create({
         id: "carbonize",
-        title: "carbonize",
+        title: "Carbonize",
         contexts: ["selection"]
     });
+    chrome.browserAction.setBadgeBackgroundColor({color: "#F00"});
+    chrome.storage.sync.set({carbonUrl: ""});
 });
 
 chrome.contextMenus.onClicked.addListener((clickData) => {
@@ -109,12 +111,9 @@ chrome.contextMenus.onClicked.addListener((clickData) => {
     if(menuItemId === "carbonize"){
         if(verifySelection(selectionText, pageUrl)){
             let snippetUrl = buildCarbonUrl(selectionText);
-            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-                const tab = tabs[0];
-                chrome.tabs.sendMessage(tab.id, {carbonUrl:snippetUrl}, (response) => {
-                    console.log(JSON.stringify(response));
-                });
-            })
+            chrome.storage.sync.set({carbonUrl: snippetUrl}, ()=>{
+                chrome.browserAction.setBadgeText({text: " "});
+            });
         }
         else{
             console.log("Site doesn't match url");
