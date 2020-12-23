@@ -22,13 +22,13 @@ const getUserSettings = () => {
             hasControls: false
         },
         padding:{
-            vertical: "29px",
-            horizontal: "27px"
+            vertical: "0px",
+            horizontal: "0px"
         },
         autoWidth: true,
         line: {
             hasNumbers: true,
-            height: 154
+            height: 133
         }
     }
 }
@@ -46,53 +46,55 @@ const verifySelection = (selectionCode, pageUrl) => {
 
 const buildCarbonUrl = (selectionCode) => {
     const settings = getUserSettings();
-    const url = ["https://carbon.now.sh/?"];
+    const carbonUrl = new URL("https://carbon.now.sh");
     if("background" in settings){
         const {red, green, blue, alpha} = settings.background;
-        let backgroundParams = `bg=rgba%28${red}%2C${green}%2C${blue}%2C${alpha}%29&`;
-        url.push(backgroundParams);
+        carbonUrl.searchParams.append("bg",`rgba%28${red}%2C${green}%2C${blue}%2C${alpha}%29` )
     }
     if("language" in settings){
-        url.push(`l=${settings.language}&`);
+        carbonUrl.searchParams.append("l", settings.language);
     }
     if("theme" in settings){
-        url.push(`t=${settings.theme}&`);
+        carbonUrl.searchParams.append("t", settings.theme);
     }
     if("dropShadow" in settings){
         const {doesExist, offset, blur} = settings.dropShadow;
         if(doesExist){
-            url.push(`ds=true&dsyoff=${offset}&dsblur=${blur}&`);
+            carbonUrl.searchParams.append("ds", true);
+            carbonUrl.searchParams.append("dsyoff", offset);
+            carbonUrl.searchParams.append("dsblur", blur);
         }
         else{
-            url.push(`ds=false&`);
+            carbonUrl.searchParams.append("ds", false);
         }
     }
     if("window" in settings){
         const {hasControls, type} = settings.window;
-        let windowParams = `wc=${hasControls}&wt=${type}&`;
-        url.push(windowParams);
+        carbonUrl.searchParams.append("wc", hasControls);
+        carbonUrl.searchParams.append("wt", type);
     }
     if("autoWidth" in settings){
-        url.push(`wa=${settings.autoWidth}&`);
+        carbonUrl.searchParams.append("wa", settings.autoWidth);
     }
     if("padding" in settings){
         const {vertical, horizontal} = settings.padding;
-        let paddingParams = `pv=${vertical}&ph=${horizontal}&`;
-        url.push(paddingParams);
+        carbonUrl.searchParams.append("pv", vertical);
+        carbonUrl.searchParams.append("ph", horizontal);
     }
     if("line" in settings){
         const {height, hasNumbers} = settings.line;
-        let lineParams = `&ln=${hasNumbers}&lh=${height}%25&`;
-        url.push(lineParams);
+        carbonUrl.searchParams.append("ln", hasNumbers);
+        carbonUrl.searchParams.append("lh", `${height}%25`);
     }
     if("font" in settings){
         const {family, size} = settings.font;
-        let fontParams = `fm=${family}&fs=${size}&`;
-        url.push(fontParams);
+        carbonUrl.searchParams.append("fm", family);
+        carbonUrl.searchParams.append("fs", size);
     }
-    url.push("wm=false&");
-    url.push(`code=${encodeURIComponent(selectionCode)}`);
-    return url.join("");
+    
+    carbonUrl.searchParams.append("wm", false);
+    carbonUrl.searchParams.append("code", encodeURIComponent(selectionCode));
+    return carbonUrl.toString();
 }
 
 
