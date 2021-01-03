@@ -1,4 +1,4 @@
-const getUserSettings = () => {
+const getDefaultSettings = () => {
     return {
         background: {
             red: 31,
@@ -45,7 +45,7 @@ const verifySelection = (selectionCode, pageUrl) => {
 
 
 const buildCarbonUrl = (selectionCode) => {
-    const settings = getUserSettings();
+    const settings = getDefaultSettings();
     const carbonUrl = new URL("https://carbon.now.sh");
     if("background" in settings){
         const {red, green, blue, alpha} = settings.background;
@@ -91,7 +91,6 @@ const buildCarbonUrl = (selectionCode) => {
         carbonUrl.searchParams.append("fm", family);
         carbonUrl.searchParams.append("fs", size);
     }
-    
     carbonUrl.searchParams.append("wm", false);
     carbonUrl.searchParams.append("code", encodeURIComponent(selectionCode));
     return carbonUrl.toString();
@@ -105,13 +104,20 @@ chrome.runtime.onInstalled.addListener(()=>{
         contexts: ["selection"]
     });
     chrome.browserAction.setBadgeBackgroundColor({color: "#F00"});
-    chrome.storage.sync.set({carbonUrl: ""});
+    const defaultOptions = {
+        theme: "blackboard",
+        language: "auto",
+        carbonUrl: ""
+    };
+
+    chrome.storage.sync.set(defaultOptions);
 });
 
 chrome.contextMenus.onClicked.addListener((clickData) => {
     const {selectionText, pageUrl, menuItemId} = clickData;
     if(menuItemId === "carbonize"){
         if(verifySelection(selectionText, pageUrl)){
+
             let snippetUrl = buildCarbonUrl(selectionText);
             chrome.storage.sync.set({carbonUrl: snippetUrl}, ()=>{
                 chrome.browserAction.setBadgeText({text: " "});

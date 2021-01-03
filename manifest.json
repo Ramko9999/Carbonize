@@ -16,5 +16,10 @@
         "scripts": ["src/background.js"],
         "persistent": false
     },
+    "content_scripts": [{
+        "matches": ["https://medium.com/*"],
+        "run_at": "document_idle",
+        "js": ["src/content.js"]        
+    }],
     "permissions":["contextMenus", "storage"]
 }
