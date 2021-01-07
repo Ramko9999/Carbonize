@@ -3,10 +3,11 @@ const copyUrlToClipboard  = (carbonUrl) => {
     return navigator.clipboard.writeText(carbonUrl);
 }
 
-const showToast = (duration) => {
+const showToast = (duration, message, color) => {
     let toastContainer = document.createElement("div");
-    toastContainer.innerText = "Link Copied!";
+    toastContainer.innerText = message;
     toastContainer.className = "toast";
+    toastContainer.style.backgroundColor = color;
 
     document.body.appendChild(toastContainer);
     setTimeout(()=>{
@@ -14,14 +15,29 @@ const showToast = (duration) => {
     }, duration);
 }
 
+const getCopiedCode = () => {
+    return window.getSelection().toString();
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    const {url, type} = request;
-    if(type === "COPY"){
+    const {type} = request
+    if(type === "BUILD"){
+        const {url} = request;
         sendResponse({status: "OK"});
         copyUrlToClipboard(url).then(()=> {
             console.log('Finished Copying!');
-            showToast(2000);
+            showToast(1000, "Linked Copied!", "green");
         });
+    }
+    else if(type === "COPY"){
+        sendResponse({
+            status: "OK",
+            code: getCopiedCode()
+        });
+    }
+    else if(type === "ERROR"){
+        const {errorMessage} = request;
+        showToast(1000, errorMessage, "red");
     }
     else{
         sendResponse({status: "FAILURE"});
