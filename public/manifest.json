@@ -10,7 +10,7 @@
     },
     "browser_action":{
         "default_title": "Carbonize",
-        "default_popup": "src/html/popup.html"
+        "default_popup": "index.html"
     },
     "background":{
         "scripts": ["src/background.js"],
@@ -19,7 +19,8 @@
     "content_scripts": [{
         "matches": ["https://medium.com/*"],
         "run_at": "document_idle",
-        "js": ["src/content.js"]        
+        "js": ["src/content.js"],   
+        "css": ["src/content.css"]     
     }],
     "permissions":["contextMenus", "storage"]
 }
